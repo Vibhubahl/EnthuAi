@@ -11,7 +11,6 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static('public'));
 app.use('/uploads',express.static(path.join(__dirname,'/uploads')));
 
-var name="";
 var isLoggedIn = false;
 
 const storage = multer.diskStorage({
@@ -58,7 +57,7 @@ app.get("/home",function(req,res)
 
 app.post("/register", async function(req,res)
 {
-    name = req.body.name;
+    const name = req.body.name;
     const pass = req.body.pass;
     const email = req.body.email;
     var status = await axios.post("http://localhost:4000/register", null,
@@ -74,15 +73,15 @@ app.post("/register", async function(req,res)
         if(response.data=="success")
         {
             isLoggedIn=true;
-            res.redirect("/home")
+            res.render("mainPage" , {Uname:name});
         }
         else if(response.data=="fail")
         {
-            res.redirect("/register")
+            res.render("register");
         }
         else if(response.data=="User Already Added")
         {
-            res.redirect("/login");
+            res.render("login");
         }
     }).catch(err=>{
             console.log();
@@ -93,6 +92,7 @@ app.post("/login", async function(req,res)
 {
     const email = req.body.email;
     const pass = req.body.pass;
+    const name = req.body.name;
     var status = await axios.post("http://localhost:4000/login" , null,
     {
         params:
@@ -106,11 +106,11 @@ app.post("/login", async function(req,res)
             if(response.data=="User Found")
             {
                 isLoggedIn=true;
-                res.redirect("/home")
+                res.render("mainPage" , {Uname:name});
             }
             else if(response.data=="Incorrect password")
             {
-                res.redirect("/login")
+                res.render("register");
             }
             else if(response.data=="Email not Registered")
             {
@@ -132,7 +132,7 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
             }
         })
         return res.status(201).json({
-            message: 'File uploded successfully'
+            message: 'Thumbnail Generated Successfully Check in uploads folder'
         });
     } catch (error) {
         console.error(error);
