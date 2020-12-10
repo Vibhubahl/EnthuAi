@@ -1,13 +1,23 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
+const md5 = require('md5')
 
 mongoose.connect("mongodb://localhost:27017/enthuAi" , { useUnifiedTopology: true, useNewUrlParser: true});
 
 const userSchema = mongoose.Schema({
-    email:String,
-    name:String,
-    password:String,
+    email:{
+        type: String,
+        required: true
+    },
+    name:{
+        type: String,
+        required: true
+    },
+    password:{
+        type: String,
+        required: true
+    }
 })
 
 const User = mongoose.model("User",userSchema);
@@ -26,7 +36,7 @@ app.post("/register", function(req,res)
             const user = new User({
                 email:req.query.email,
                 name:req.query.name,
-                password:req.query.pass
+                password:md5(req.query.pass)
             })
             user.save(function(err)
             {
@@ -57,7 +67,7 @@ app.post("/login", function(req,res)
         {
             if(found)
             {
-                if(found.password==pass)
+                if(found.password==md5(pass))
                 {
                     res.send("User Found")
                 }

@@ -12,6 +12,7 @@ app.use(express.static('public'));
 app.use('/uploads',express.static(path.join(__dirname,'/uploads')));
 
 var name="";
+var isLoggedIn = false;
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -48,6 +49,10 @@ app.get("/register", function(req,res)
 
 app.get("/home",function(req,res)
 {
+    if(!isLoggedIn)
+    {
+        res.redirect("/");
+    }
     res.render("mainPage" , {Uname:name});
 })
 
@@ -68,6 +73,7 @@ app.post("/register", async function(req,res)
     {
         if(response.data=="success")
         {
+            isLoggedIn=true;
             res.redirect("/home")
         }
         else if(response.data=="fail")
@@ -99,6 +105,7 @@ app.post("/login", async function(req,res)
         {
             if(response.data=="User Found")
             {
+                isLoggedIn=true;
                 res.redirect("/home")
             }
             else if(response.data=="Incorrect password")
